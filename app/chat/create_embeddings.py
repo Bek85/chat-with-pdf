@@ -1,3 +1,8 @@
+from pypdf import PdfReader
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+
 def create_embeddings_for_pdf(pdf_id: str, pdf_path: str):
     """
     Generate and store embeddings for the given pdf
@@ -15,4 +20,13 @@ def create_embeddings_for_pdf(pdf_id: str, pdf_path: str):
     create_embeddings_for_pdf('123456', '/path/to/pdf')
     """
 
-    pass
+    # 1. Extract text from the specified PDF
+    print(f"Processing PDF: {pdf_id}, Path: {pdf_path}")
+
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+    loader = PyPDFLoader(pdf_path)
+
+    docs = loader.load_and_split(text_splitter)
+
+    print(f"Extracted {len(docs)} chunks from PDF {pdf_id}")
+    print(docs)
