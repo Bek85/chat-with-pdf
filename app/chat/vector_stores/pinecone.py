@@ -2,15 +2,14 @@ from pinecone import Pinecone
 from langchain_pinecone import PineconeVectorStore
 import os
 from app.chat.embeddings.openai import embeddings
-import logging
+from app.logging import get_module_logger
 from dotenv import load_dotenv
 
 # Load environment variables first
 load_dotenv()
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = get_module_logger("chat.vector_stores.pinecone")
 
 # Get Pinecone credentials from environment
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")

@@ -13,12 +13,16 @@ from app.web.views import (
     client_views,
     conversation_views,
 )
+from app.logging.flask_setup import init_app_logging
 
 
 def create_app():
     app = Flask(__name__, static_folder="../../client/build")
     app.url_map.strict_slashes = False
     app.config.from_object(Config)
+
+    # Initialize colorful logging for Flask app
+    init_app_logging(app)
 
     register_extensions(app)
     register_hooks(app)
