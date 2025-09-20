@@ -63,3 +63,9 @@ class BaseModel(db.Model):
         if commit:
             db.session.commit()
         return self
+
+    def delete(self, commit=True):
+        db.session.delete(self)
+        if commit:
+            db.session.commit()
+        return self

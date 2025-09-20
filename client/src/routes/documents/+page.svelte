@@ -1,10 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import AuthGuard from '$c/AuthGuard.svelte';
+	import Icon from '$c/Icon.svelte';
+	import { deleteDocument } from '$s/documents';
 
 	export let data: PageData;
 
 	const documents = data.documents || [];
+
+	const handleDelete = async (id: string) => {
+		if (confirm('Are you sure you want to delete this document?')) {
+			await deleteDocument(id);
+		}
+	};
 </script>
 
 <AuthGuard />
@@ -52,9 +60,22 @@
 									>{document.id}</td
 								>
 								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-									<a class="text-blue-500 hover:text-blue-700" href="/documents/{document.id}"
-										>View</a
-									>
+									<div class="flex justify-end gap-2">
+										<a
+											class="text-blue-500 hover:text-blue-700 p-1"
+											href="/documents/{document.id}"
+											title="View document"
+										>
+											<Icon name="visibility" size="20px" />
+										</a>
+										<button
+											class="text-red-500 hover:text-red-700 p-1"
+											on:click={() => handleDelete(document.id)}
+											title="Delete document"
+										>
+											<Icon name="delete" size="20px" />
+										</button>
+									</div>
 								</td>
 							</tr>
 						{/each}

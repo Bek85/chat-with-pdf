@@ -18,6 +18,16 @@ def create_download_url(file_id):
     return f"{Config.UPLOAD_URL}/download/{file_id}"
 
 
+def delete(file_id: str) -> Tuple[Dict[str, Any], int]:
+    """Delete a file from the upload service"""
+    delete_url = f"{Config.UPLOAD_URL}/delete/{file_id}"
+    response = requests.delete(delete_url)
+    try:
+        return json.loads(response.text), response.status_code
+    except json.JSONDecodeError:
+        return {"message": "File deleted"}, response.status_code
+
+
 def download(file_id):
     return _Download(file_id)
 

@@ -52,8 +52,21 @@ const getDocuments = async () => {
 	set({ data });
 };
 
+const deleteDocument = async (id: string) => {
+	try {
+		await api.delete(`/pdfs/${id}`);
+		// Remove the document from the store
+		documents.update((state) => ({
+			...state,
+			data: state.data.filter((doc) => doc.id !== id)
+		}));
+	} catch (error) {
+		set({ error: getErrorMessage(error) });
+	}
+};
+
 const clearErrors = () => {
 	set({ error: '', uploadProgress: 0 });
 };
 
-export { upload, getDocuments, documents, clearErrors };
+export { upload, getDocuments, documents, clearErrors, deleteDocument };

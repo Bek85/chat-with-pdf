@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Alex/learning/ai_apps/stephen_grider/chat-with-pdf-starter/app/web/tasks/**)",
+      "Read(//c/Alex/learning/ai_apps/stephen_grider/chat-with-pdf-starter/app/chat/vector_stores/**)",
+      "Read(//c/Alex/learning/ai_apps/stephen_grider/chat-with-pdf-starter/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
