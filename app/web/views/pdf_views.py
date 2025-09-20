@@ -5,6 +5,7 @@ from app.web.db.models import Pdf
 from app.web.db.models.conversation import Conversation
 from app.web.db.models.message import Message
 from app.web.tasks.embeddings import process_document
+from app.chat.vector_stores.pinecone import delete_embeddings_for_pdf
 from app.web import files
 
 bp = Blueprint("pdf", __name__, url_prefix="/api/pdfs")
@@ -56,6 +57,9 @@ def delete(pdf):
         if status_code >= 400:
             # Log but don't fail the operation if file deletion fails
             pass
+
+        # Delete embeddings from Pinecone vector store
+        delete_embeddings_for_pdf(pdf.id)
 
         # Delete all conversations and their messages associated with this PDF
         conversations = Conversation.where(pdf_id=pdf.id)

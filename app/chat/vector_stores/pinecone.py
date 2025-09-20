@@ -60,5 +60,91 @@ def initialize_pinecone():
         return create_fallback_vector_store()
 
 
+def delete_embeddings_for_pdf(pdf_id: str):
+    """Delete all embeddings associated with a specific PDF ID"""
+    try:
+        if not PINECONE_API_KEY:
+            logger.warning("PINECONE_API_KEY not set, skipping Pinecone cleanup")
+            return False
+
+        logger.info(f"Starting Pinecone cleanup for PDF ID: {pdf_id}")
+        pc = Pinecone(api_key=PINECONE_API_KEY)
+
+        # Check if index exists
+        indexes = pc.list_indexes()
+        index_names = [index_info["name"] for index_info in indexes]
+        logger.info(f"Available indexes: {index_names}")
+
+        if PINECONE_INDEX_NAME not in index_names:
+            logger.warning(f"Pinecone index '{PINECONE_INDEX_NAME}' does not exist, skipping cleanup")
+            return False
+
+        index = pc.Index(PINECONE_INDEX_NAME)
+
+        # Check index stats before deletion
+        stats_before = index.describe_index_stats()
+        logger.info(f"Index stats before deletion: {stats_before}")
+
+        # Try multiple deletion approaches since metadata filtering can be tricky
+
+        # Approach 1: Direct metadata filter (what we tried before)
+        try:
+            delete_response = index.delete(
+                filter={"pdf_id": pdf_id}
+            )
+            logger.info(f"Delete response with simple filter: {delete_response}")
+        except Exception as e:
+            logger.warning(f"Simple filter deletion failed: {e}")
+
+        # Approach 2: Try with explicit equality operator
+        try:
+            delete_response = index.delete(
+                filter={"pdf_id": {"$eq": pdf_id}}
+            )
+            logger.info(f"Delete response with $eq filter: {delete_response}")
+        except Exception as e:
+            logger.warning(f"$eq filter deletion failed: {e}")
+
+        # Approach 3: Delete all vectors and recreate (if needed)
+        # This is more aggressive but ensures cleanup
+        try:
+            # First query to get vector IDs with this pdf_id
+            query_response = index.query(
+                vector=[0.01] * 1536,  # Small non-zero vector
+                filter={"pdf_id": pdf_id},
+                top_k=10000,  # Large number to get all matches
+                include_metadata=True
+            )
+
+            if query_response.matches:
+                vector_ids = [match.id for match in query_response.matches]
+                logger.info(f"Found {len(vector_ids)} vectors to delete for pdf_id={pdf_id}")
+
+                # Log sample metadata for debugging
+                for i, match in enumerate(query_response.matches[:3]):
+                    logger.info(f"Sample vector {i}: ID={match.id}, metadata={match.metadata}")
+
+                # Delete by IDs
+                if vector_ids:
+                    delete_response = index.delete(ids=vector_ids)
+                    logger.info(f"Delete by IDs response: {delete_response}")
+            else:
+                logger.warning(f"No vectors found with pdf_id={pdf_id} during query")
+
+        except Exception as e:
+            logger.error(f"Query and delete by IDs failed: {e}")
+
+        # Check stats after deletion
+        stats_after = index.describe_index_stats()
+        logger.info(f"Index stats after deletion: {stats_after}")
+
+        logger.info(f"Completed Pinecone cleanup attempt for PDF {pdf_id}")
+        return True
+
+    except Exception as e:
+        logger.error(f"Error deleting embeddings for PDF {pdf_id} from Pinecone: {str(e)}", exc_info=True)
+        return False
+
+
 # Initialize the vector store
 vector_store = initialize_pinecone()

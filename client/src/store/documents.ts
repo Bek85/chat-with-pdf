@@ -12,12 +12,14 @@ interface UploadStore {
 	data: Document[];
 	error: string;
 	uploadProgress: number;
+	deletingIds: Set<string>;
 }
 
 const INITIAL_STATE = {
 	data: [],
 	error: '',
-	uploadProgress: 0
+	uploadProgress: 0,
+	deletingIds: new Set<string>()
 };
 
 const documents = writable<UploadStore>(INITIAL_STATE);
@@ -53,15 +55,38 @@ const getDocuments = async () => {
 };
 
 const deleteDocument = async (id: string) => {
+	// Add to deleting set
+	documents.update((state) => ({
+		...state,
+		deletingIds: new Set([...state.deletingIds, id]),
+		error: ''
+	}));
+
 	try {
 		await api.delete(`/pdfs/${id}`);
-		// Remove the document from the store
-		documents.update((state) => ({
-			...state,
-			data: state.data.filter((doc) => doc.id !== id)
-		}));
+		// Remove the document from the store and clear deleting state
+		documents.update((state) => {
+			const newDeletingIds = new Set(state.deletingIds);
+			newDeletingIds.delete(id);
+			return {
+				...state,
+				data: state.data.filter((doc) => doc.id !== id),
+				deletingIds: newDeletingIds
+			};
+		});
+		return { success: true };
 	} catch (error) {
-		set({ error: getErrorMessage(error) });
+		// Remove from deleting set and set error
+		documents.update((state) => {
+			const newDeletingIds = new Set(state.deletingIds);
+			newDeletingIds.delete(id);
+			return {
+				...state,
+				deletingIds: newDeletingIds,
+				error: getErrorMessage(error)
+			};
+		});
+		return { success: false, error: getErrorMessage(error) };
 	}
 };
 
