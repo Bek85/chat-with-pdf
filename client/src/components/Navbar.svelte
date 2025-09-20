@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AuthLinks from '$c/auth/AuthLinks.svelte';
+	import ThemeToggle from '$c/ThemeToggle.svelte';
 	import { auth } from '$s/auth';
 
 	$: user = $auth.user;
@@ -18,6 +19,7 @@
 				class="font-medium text-gray-600 hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-500"
 				href="/spec.html">API Spec</a
 			> -->
+      <ThemeToggle />
 			{#if user}
 				<a
 					class="font-medium text-gray-600 hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-500"
@@ -28,6 +30,7 @@
 					href="/documents">Documents</a
 				>
 			{/if}
+
 			<AuthLinks />
 		</div>
 	</nav>

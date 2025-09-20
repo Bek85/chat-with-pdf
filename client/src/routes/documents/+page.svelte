@@ -9,7 +9,7 @@
 
 <AuthGuard />
 <div class="flex flex-row justify-between items-center my-4">
-	<h2 class="text-3xl font-bold m-2">Your Documents</h2>
+	<h2 class="text-3xl font-bold m-2 text-gray-900 dark:text-gray-100">Your Documents</h2>
 	<div class="">
 		<a
 			href="/documents/new"
@@ -22,21 +22,21 @@
 <div class="flex flex-col">
 	<div class="-m-1.5 overflow-x-auto">
 		<div class="p-1.5 min-w-full inline-block align-middle">
-			<div class="border rounded-lg overflow-hidden">
+			<div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
 				<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-					<thead class="bg-gray-50">
+					<thead class="bg-gray-50 dark:bg-gray-800">
 						<tr>
 							<th
 								scope="col"
-								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th
 							>
 							<th
 								scope="col"
-								class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th
+								class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">ID</th
 							>
 							<th
 								scope="col"
-								class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th
+								class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Action</th
 							>
 						</tr>
 					</thead>

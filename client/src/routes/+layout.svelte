@@ -5,6 +5,7 @@
 	import Navbar from '$c/Navbar.svelte';
 	import ErrorModal from '$c/ErrorModal.svelte';
 	import { getUser, auth } from '$s/auth';
+	import { theme } from '$s/theme';
 
 	export const ssr = false;
 
@@ -14,11 +15,12 @@
 		if (user === null) {
 			getUser();
 		}
+		theme.init();
 	});
 </script>
 
 <ErrorModal />
-<div class="container mx-auto h-screen">
+<div class="container mx-auto h-screen bg-white dark:bg-gray-900 transition-colors">
 	<Navbar />
 	<slot />
 </div>

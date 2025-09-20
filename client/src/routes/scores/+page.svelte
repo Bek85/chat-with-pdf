@@ -12,25 +12,25 @@
 
 <AuthGuard />
 <div class="w-1/2">
-	<h2 class="text-3xl font-bold m-3">LLM Scores</h2>
+	<h2 class="text-3xl font-bold m-3 text-gray-900 dark:text-gray-100">LLM Scores</h2>
 	{#if llmScores}
 		<BarChart startingColor={{ r: 0, g: 99, b: 132 }} data={llmScores} />
 	{/if}
 </div>
 
-<hr class="m-10" />
+<hr class="m-10 border-gray-300 dark:border-gray-600" />
 
 <div class="w-1/2">
-	<h2 class="text-3xl font-bold m-3">Retriever Scores</h2>
+	<h2 class="text-3xl font-bold m-3 text-gray-900 dark:text-gray-100">Retriever Scores</h2>
 	{#if retrieverScores}
 		<BarChart startingColor={{ r: 255, g: 99, b: 132 }} data={retrieverScores} />
 	{/if}
 </div>
 
-<hr class="m-10" />
+<hr class="m-10 border-gray-300 dark:border-gray-600" />
 
 <div class="w-1/2">
-	<h2 class="text-3xl font-bold m-3">Memory Scores</h2>
+	<h2 class="text-3xl font-bold m-3 text-gray-900 dark:text-gray-100">Memory Scores</h2>
 	{#if memoryScores}
 		<BarChart startingColor={{ r: 30, g: 200, b: 60 }} data={memoryScores} />
 	{/if}

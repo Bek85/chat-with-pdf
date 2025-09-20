@@ -37,16 +37,16 @@
 
 <div
 	style="height: calc(100vh - 80px);"
-	class="flex flex-col h-full bg-slate-50 border rounded-xl shadow"
+	class="flex flex-col h-full bg-slate-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow"
 >
-	<div class="rounded-lg border-b px-3 py-2 flex flex-row items-center justify-between">
+	<div class="rounded-lg border-b border-gray-200 dark:border-gray-600 px-3 py-2 flex flex-row items-center justify-between">
 		<div class="opacity-40">
 			<input id="chat-type" type="checkbox" bind:checked={useStreaming} />
-			<label for="chat-type" class="italic">Streaming</label>
+			<label for="chat-type" class="italic text-gray-700 dark:text-gray-300">Streaming</label>
 		</div>
 		<div class="flex gap-2">
 			<ConversationSelect conversations={$store.conversations} />
-			<button class="rounded text-sm border border-blue-500 px-2 py-0.5" on:click={handleNewChat}
+			<button class="rounded text-sm border border-blue-500 text-blue-500 dark:text-blue-400 dark:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 px-2 py-0.5" on:click={handleNewChat}
 				>New Chat</button
 			>
 		</div>
