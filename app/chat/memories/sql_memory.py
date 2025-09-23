@@ -25,7 +25,7 @@ class SqlMessageHistory(BaseChatMessageHistory, BaseModel):
 
 def build_memory(chat_args):
     return ConversationBufferMemory(
-        chat_memory=SqlMessageHistory(conversation_id=chat_args),
+        chat_memory=SqlMessageHistory(conversation_id=chat_args.conversation_id),
         return_messages=True,
         memory_key="chat_history",
         output_key="answer",
