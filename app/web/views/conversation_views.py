@@ -42,14 +42,34 @@ def create_message(conversation):
         },
     )
 
+    from app.chat.memories.sql_memory import SqlMessageHistory
+    from app.web.api import get_messages_by_conversation_id
+
     chat = build_chat(chat_args)
+    sql_memory = SqlMessageHistory(conversation_id=conversation.id)
 
     if not chat:
         return "Chat not yet implemented!"
 
+    # Get chat history for the chain - directly from the API
+    chat_history = get_messages_by_conversation_id(conversation.id)
+
     if streaming:
         return Response(
-            stream_with_context(chat.stream(input)), mimetype="text/event-stream"
+            stream_with_context(chat.stream({"question": input, "chat_history": chat_history})), mimetype="text/event-stream"
         )
     else:
-        return jsonify({"role": "assistant", "content": chat.run(input)})
+        # Simple approach: just run the chain
+        from langchain.schema import HumanMessage, AIMessage
+
+        # Add user message to memory
+        sql_memory.add_message(HumanMessage(content=input))
+
+        # Run chain with the question and chat history
+        result = chat.invoke({"question": input, "chat_history": chat_history})
+        answer = result["answer"]
+
+        # Add AI response to memory
+        sql_memory.add_message(AIMessage(content=answer))
+
+        return jsonify({"role": "assistant", "content": answer})
