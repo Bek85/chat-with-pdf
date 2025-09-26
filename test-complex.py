@@ -1,4 +1,4 @@
-from langchain.chat_models import init_chat_model
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
 from langchain.callbacks.base import BaseCallbackHandler
@@ -23,7 +23,7 @@ class StreamingHandler(BaseCallbackHandler):
         queue.put(None)
 
 
-chat = init_chat_model(model="gpt-4o-mini", streaming=True)
+chat = ChatOpenAI(streaming=True, callbacks=[StreamingHandler()])
 
 prompt = ChatPromptTemplate.from_messages([("human", "{content}")])
 
