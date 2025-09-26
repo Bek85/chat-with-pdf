@@ -19,7 +19,7 @@ tiktoken==0.7.0
 
 # Vector Store & Embeddings
 pinecone-client>=6.0.0
-langchain-pinecone>=0.2.4
+langchain-pinecone>=0.3.0
 faiss-cpu==1.10.0
 
 # PDF Processing & Document Handling
