@@ -30,7 +30,7 @@ chat = ChatOpenAI(
     model="deepseek-chat",
     openai_api_key=os.getenv("DEEPSEEK_API_KEY"),
     openai_api_base=os.getenv("DEEPSEEK_BASE_URL"),
-    streaming=True
+    streaming=True,
 )
 
 prompt = ChatPromptTemplate.from_messages([("human", "{content}")])
