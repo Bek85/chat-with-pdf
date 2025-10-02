@@ -1,8 +1,12 @@
 import os
-from langchain_openai import OpenAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-embeddings = OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY"))
+# Use HuggingFace embeddings (dimension 384) for the new Pinecone index
+print("Using HuggingFace embeddings (dimension 384)")
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
