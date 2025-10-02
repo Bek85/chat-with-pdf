@@ -21,6 +21,8 @@ tiktoken==0.7.0
 pinecone-client>=6.0.0
 langchain-pinecone>=0.3.0
 faiss-cpu==1.10.0
+langchain-huggingface>=0.3.1
+sentence-transformers>=5.1.1
 
 # PDF Processing & Document Handling
 pypdf==3.15.4
