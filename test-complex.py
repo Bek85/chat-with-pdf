@@ -5,6 +5,7 @@ from langchain.callbacks.base import BaseCallbackHandler
 from dotenv import load_dotenv
 from queue import Queue
 from threading import Thread
+import os
 
 
 load_dotenv()
@@ -24,12 +25,18 @@ class StreamingHandler(BaseCallbackHandler):
         self.queue.put(None)
 
 
-chat = ChatOpenAI(streaming=True)
+# Use DeepSeek directly since OpenAI quota is exceeded
+chat = ChatOpenAI(
+    model="deepseek-chat",
+    openai_api_key=os.getenv("DEEPSEEK_API_KEY"),
+    openai_api_base=os.getenv("DEEPSEEK_BASE_URL"),
+    streaming=True
+)
 
 prompt = ChatPromptTemplate.from_messages([("human", "{content}")])
 
 
-class StreamingChain(LLMChain):
+class StreamableChain:
     def stream(self, input):
         queue = Queue()
         handler = StreamingHandler(queue)
@@ -44,6 +51,10 @@ class StreamingChain(LLMChain):
             if token is None:
                 break
             yield token
+
+
+class StreamingChain(StreamableChain, LLMChain):
+    pass
 
 
 chain = StreamingChain(llm=chat, prompt=prompt)
