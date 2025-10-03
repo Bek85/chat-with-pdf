@@ -77,6 +77,14 @@ def configure_logging(config: Optional[LoggerConfig] = None) -> None:
     if _configured:
         return
 
+    # Fix Windows encoding issues by forcing UTF-8 for all stream outputs
+    import sys
+    import io
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
     # Get the root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(getattr(logging, _config.level))

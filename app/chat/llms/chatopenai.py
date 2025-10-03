@@ -1,8 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage
-from langchain_core.outputs import ChatResult
-from typing import List, Optional, Any
+from langchain_core.outputs import ChatResult, ChatGenerationChunk
+from typing import List, Optional, Any, Iterator
+from langchain_core.callbacks import CallbackManagerForLLMRun
 import os
 
 
@@ -42,13 +43,45 @@ class FallbackChatModel(BaseChatModel):
             return getattr(self._get_fallback(), method)(*args, **kwargs)
         raise
 
-    def _generate(self, messages: List[BaseMessage], stop: Optional[List[str]] = None, **kwargs) -> ChatResult:
+    def _generate(self, messages: List[BaseMessage], stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs) -> ChatResult:
         if self.use_fallback:
-            return self._get_fallback()._generate(messages, stop=stop, **kwargs)
+            return self._get_fallback()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
         try:
-            return self.primary._generate(messages, stop=stop, **kwargs)
+            return self.primary._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
         except Exception as e:
-            return self._handle_error(e, "_generate", messages, stop=stop, **kwargs)
+            if "rate_limit" in str(e).lower() or "quota" in str(e).lower() or "429" in str(e):
+                print("OpenAI quota exceeded, switching to DeepSeek...")
+                self.use_fallback = True
+                return self._get_fallback()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
+            else:
+                raise
+
+    def _stream(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> Iterator[ChatGenerationChunk]:
+        if self.use_fallback:
+            yield from self._get_fallback()._stream(messages, stop=stop, run_manager=run_manager, **kwargs)
+            return
+
+        try:
+            # Create an iterator from the primary stream
+            stream_iter = self.primary._stream(messages, stop=stop, run_manager=run_manager, **kwargs)
+            # Try to get the first chunk to trigger any connection errors
+            first_chunk = next(stream_iter)
+            # If successful, yield the first chunk and continue
+            yield first_chunk
+            yield from stream_iter
+        except Exception as e:
+            if "rate_limit" in str(e).lower() or "quota" in str(e).lower() or "429" in str(e):
+                print("OpenAI quota exceeded, switching to DeepSeek...")
+                self.use_fallback = True
+                yield from self._get_fallback()._stream(messages, stop=stop, run_manager=run_manager, **kwargs)
+            else:
+                raise
 
     @property
     def _llm_type(self) -> str:
